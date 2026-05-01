@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>WBTI · 武侠行为类型指示器</title>
+<style>
+  /* ===== Reset & Base ===== */
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  
+  :root {
+    --bg: #0a0a0f;
+    --bg-card: #14141f;
+    --bg-card2: #1a1a2e;
+    --text: #e8e6e3;
+    --text-light: #8b8b9e;
+    --accent: #ff6b35;
+    --gold: #ffd700;
+    --gold-dim: #b8962a;
+    --cyan: #00d4ff;
+    --border: #2a2a3e;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --neon-gold: 0 0 10px rgba(255, 215, 0, 0.3);
+    --neon-cyan: 0 0 10px rgba(0, 212, 255, 0.3);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ===== Pages ===== */
+  .page {
+    display: none;
+    min-height: 100vh;
+    flex-direction: column;
+    align-items: center;
+  }
+  .page.active { display: flex; }
+
+  /* ===== Welcome Page ===== */
+  #welcome {
+    justify-content: center;
+    padding: 40px 24px;
+    background: linear-gradient(180deg, #0a0a0f 0%, #12121f 40%, #1a1025 100%);
+    color: #f5efe6;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #welcome::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: 
+      radial-gradient(ellipse at 20% 50%, rgba(255, 107, 53, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(0, 212, 255, 0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 80%, rgba(255, 215, 0, 0.04) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  #welcome::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Ccircle cx='20' cy='20' r='1'/%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .welcome-emoji {
+    font-size: 56px;
+    margin-bottom: 20px;
+    position: relative;
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
+  }
+
+  .welcome-title {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: 6px;
+    margin-bottom: 8px;
+    position: relative;
+    background: linear-gradient(135deg, var(--gold) 0%, #fff 50%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+  }
+
+  .welcome-subtitle {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-bottom: 32px;
+    position: relative;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  .welcome-desc {
+    font-size: 14px;
+    color: #7a7a8e;
+    line-height: 2;
+    max-width: 320px;
+    margin: 0 auto 40px;
+    position: relative;
+  }
+
+  .welcome-desc .highlight {
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  .welcome-stats {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 40px;
+    position: relative;
+  }
+
+  .welcome-stat {
+    text-align: center;
+  }
+
+  .welcome-stat-num {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--gold);
+    text-shadow: var(--neon-gold);
+  }
+
+  .welcome-stat-label {
+    font-size: 11px;
+    color: #5a5a6e;
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  .btn-start {
+    position: relative;
+    background: linear-gradient(135deg, var(--accent) 0%, #ff8c42 100%);
+    color: #fff;
+    border: none;
+    padding: 16px 64px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 24px rgba(255, 107, 53, 0.4), 0 0 60px rgba(255, 107, 53, 0.1);
+  }
+
+  .btn-start:hover { transform: translateY(-2px); box-shadow: 0 6px 32px rgba(255, 107, 53, 0.5); }
+  .btn-start:active { transform: translateY(0); }
+
+  .welcome-footer {
+    position: relative;
+    margin-top: 40px;
+    font-size: 11px;
+    color: #4a4a5e;
+  }
+
+  .welcome-types {
+    position: relative;
+    margin-top: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    max-width: 340px;
+  }
+
+  .welcome-type-chip {
+    padding: 4px 10px;
+    background: rgba(255, 215, 0, 0.08);
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    border-radius: 12px;
+    font-size: 10px;
+    color: var(--gold-dim);
+    letter-spacing: 1px;
+  }
+
+  /* ===== Question Page ===== */
+  #question {
+    padding: 0;
+    background: var(--bg);
+  }
+
+  .q-header {
+    position: sticky;
+    top: 0;
+    background: rgba(10, 10, 15, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 20px 24px 0;
+    z-index: 10;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .q-progress-wrap {
+    width: 100%;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .q-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+  }
+
+  .q-counter {
+    font-size: 12px;
+    color: var(--text-light);
+    text-align: right;
+  }
+
+  .q-body {
+    flex: 1;
+    padding: 24px;
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .q-scene {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 2;
+    margin-bottom: 28px;
+    padding: 20px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    box-shadow: 0 2px 12px var(--shadow);
+    border-left: 3px solid var(--accent);
+    position: relative;
+  }
+
+  .q-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .q-option {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .q-option:hover {
+    border-color: rgba(255, 215, 0, 0.3);
+    background: var(--bg-card2);
+  }
+
+  .q-option:active {
+    transform: scale(0.98);
+  }
+
+  .q-option.selected {
+    border-color: var(--gold);
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(255, 107, 53, 0.05) 100%);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+  }
+
+  .q-option.selected::after {
+    content: '\2713';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background: var(--gold);
+    color: #0a0a0f;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .q-option-label {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    text-align: center;
+    background: var(--border);
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+
+  .q-option.selected .q-option-label {
+    background: var(--gold);
+    color: #0a0a0f;
+  }
+
+  .q-option-text {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .btn-next {
+    display: none;
+    margin: 24px auto 40px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 14px 48px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
+  }
+
+  .btn-next.visible { display: block; animation: fadeUp 0.3s ease; }
+
+  /* ===== Loading Page ===== */
+  #loading {
+    justify-content: center;
+    background: linear-gradient(180deg, #0a0a0f, #12121f);
+    color: #f5efe6;
+    text-align: center;
+    padding: 40px;
+  }
+
+  .loading-icon {
+    font-size: 64px;
+    margin-bottom: 24px;
+    animation: pulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.4));
+  }
+
+  .loading-text {
+    font-size: 14px;
+    color: var(--text-light);
+    letter-spacing: 2px;
+  }
+
+  .loading-dots::after {
+    content: '';
+    animation: dots 1.5s steps(4, end) infinite;
+  }
+
+  @keyframes dots {
+    0% { content: ''; }
+    25% { content: '.'; }
+    50% { content: '..'; }
+    75% { content: '...'; }
+    100% { content: ''; }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes glow {
+    0%, 100% { text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+    50% { text-shadow: 0 0 30px rgba(255, 215, 0, 0.8), 0 0 60px rgba(255, 215, 0, 0.3); }
+  }
+
+  /* ===== Result Page ===== */
+  #result {
+    background: var(--bg);
+    padding: 0;
+  }
+
+  .result-hero {
+    background: linear-gradient(180deg, #0a0a0f 0%, #12121f 60%, var(--bg) 100%);
+    padding: 48px 24px 80px;
+    text-align: center;
+    color: #f5efe6;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: 
+      radial-gradient(ellipse at 30% 30%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 60%, rgba(255, 107, 53, 0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .result-emoji {
+    font-size: 72px;
+    margin-bottom: 16px;
+    position: relative;
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.4));
+  }
+
+  .result-code {
+    display: inline-block;
+    padding: 6px 20px;
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 6px;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--gold);
+    letter-spacing: 8px;
+    margin-bottom: 12px;
+    position: relative;
+    text-shadow: var(--neon-gold);
+    animation: glow 3s ease-in-out infinite;
+  }
+
+  .result-name {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    margin-bottom: 8px;
+    position: relative;
+    color: #fff;
+  }
+
+  .result-title {
+    font-size: 13px;
+    color: var(--text-light);
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .result-quote {
+    font-size: 14px;
+    color: #9a9aae;
+    font-style: italic;
+    max-width: 320px;
+    margin: 0 auto;
+    line-height: 2;
+    position: relative;
+  }
+
+  .match-score {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 4px 16px;
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--cyan);
+    letter-spacing: 1px;
+    position: relative;
+  }
+
+  .result-body {
+    padding: 0 24px 40px;
+    max-width: 500px;
+    margin: -40px auto 0;
+    position: relative;
+  }
+
+  .result-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 24px var(--shadow);
+    margin-bottom: 16px;
+    animation: fadeUp 0.5s ease;
+  }
+
+  .result-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 1px;
+  }
+
+  .result-card-title::before {
+    content: '';
+    width: 3px;
+    height: 16px;
+    background: var(--gold);
+    border-radius: 2px;
+    box-shadow: var(--neon-gold);
+  }
+
+  .result-card p {
+    font-size: 14px;
+    color: #9a9aae;
+    line-height: 2;
+  }
+
+  .result-traits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .result-trait {
+    padding: 4px 12px;
+    background: rgba(255, 215, 0, 0.06);
+    border: 1px solid rgba(255, 215, 0, 0.12);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--gold-dim);
+    letter-spacing: 0.5px;
+  }
+
+  /* Trait bars */
+  .trait-bars { margin-top: 16px; }
+
+  .trait-bar-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .trait-bar-label {
+    font-size: 11px;
+    color: var(--text-light);
+    width: 100px;
+    flex-shrink: 0;
+    text-align: right;
+    margin-right: 12px;
+  }
+
+  .trait-bar-track {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .trait-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+  }
+
+  .trait-bar-fill.gold {
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+  }
+
+  .trait-bar-fill.cyan {
+    background: linear-gradient(90deg, #0088aa, var(--cyan));
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.3);
+  }
+
+  .trait-bar-fill.red {
+    background: linear-gradient(90deg, #cc4444, var(--accent));
+    box-shadow: 0 0 8px rgba(255, 107, 53, 0.3);
+  }
+
+  /* Hidden section */
+  .result-hidden {
+    border: 1px dashed rgba(255, 215, 0, 0.2);
+    background: rgba(255, 215, 0, 0.03);
+    padding: 20px;
+    margin-top: 16px;
+    border-radius: 12px;
+  }
+
+  .result-hidden-title {
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .result-hidden p {
+    font-size: 13px;
+    color: #7a7a8e;
+    line-height: 2;
+  }
+
+  /* Share section */
+  .result-share {
+    text-align: center;
+    padding: 32px 24px;
+  }
+
+  .result-share-title {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+  }
+
+  .btn-share {
+    display: inline-block;
+    background: linear-gradient(135deg, #07c160, #06ad56);
+    color: #fff;
+    border: none;
+    padding: 12px 40px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 50px;
+    cursor: pointer;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 16px rgba(7, 193, 96, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .btn-share:hover { transform: translateY(-1px); }
+
+  .btn-retry {
+    display: inline-block;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-light);
+    padding: 10px 32px;
+    font-size: 13px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-retry:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+  /* Footer */
+  .result-footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 10px;
+    color: #3a3a4e;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+    letter-spacing: 1px;
+  }
+
+  .result-footer a { color: var(--text-light); text-decoration: none; }
+
+  /* Mobile */
+  @media (max-width: 400px) {
+    .welcome-title { font-size: 26px; letter-spacing: 3px; }
+    .result-code { font-size: 16px; letter-spacing: 6px; }
+    .result-name { font-size: 20px; }
+    .q-scene { padding: 16px; font-size: 14px; }
+    .q-option { padding: 14px 16px; font-size: 13px; }
+    .trait-bar-label { width: 80px; font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== WELCOME PAGE ==================== -->
+<div class="page active" id="welcome">
+  <div class="welcome-emoji">&#9876;&#65039;</div>
+  <div class="welcome-title">WBTI</div>
+  <div class="welcome-subtitle">Wushu Behavioral Type Indicator</div>
+  <div class="welcome-desc">
+    19种武侠人格 · 6维度深度分析<br>
+    你在江湖里到底是个什么角色？<br>
+    <span class="highlight">结果又损又准，慎重点开。</span>
+  </div>
+  <div class="welcome-stats">
+    <div class="welcome-stat">
+      <div class="welcome-stat-num">20</div>
+      <div class="welcome-stat-label">道题</div>
+    </div>
+    <div class="welcome-stat">
+      <div class="welcome-stat-num">19</div>
+      <div class="welcome-stat-label">种人格</div>
+    </div>
+    <div class="welcome-stat">
+      <div class="welcome-stat-num">3min</div>
+      <div class="welcome-stat-label">够快</div>
+    </div>
+  </div>
+  <button class="btn-start" onclick="startTest()">测测我是谁</button>
+  <div class="welcome-types">
+    <span class="welcome-type-chip">JUDGE 铁判官</span>
+    <span class="welcome-type-chip">ZHE 棋仙</span>
+    <span class="welcome-type-chip">WANG 王者</span>
+    <span class="welcome-type-chip">MAMO 吗喽侠</span>
+    <span class="welcome-type-chip">SHA 杀神</span>
+    <span class="welcome-type-chip">SHEN ???</span>
+  </div>
+  <div class="welcome-footer">已有 <span id="fakeCount">287,643</span> 人被精准破防 · 含1个隐藏人格</div>
+</div>
+
+<!-- ==================== QUESTION PAGE ==================== -->
+<div class="page" id="question">
+  <div class="q-header">
+    <div class="q-progress-wrap">
+      <div class="q-progress-bar" id="progressBar"></div>
+    </div>
+    <div class="q-counter" id="qCounter">1 / 20</div>
+  </div>
+  <div class="q-body">
+    <div class="q-scene" id="qScene"></div>
+    <div class="q-options" id="qOptions"></div>
+    <button class="btn-next" id="btnNext" onclick="nextQuestion()">下一题</button>
+  </div>
+</div>
+
+<!-- ==================== LOADING PAGE ==================== -->
+<div class="page" id="loading">
+  <div class="loading-icon">&#9876;&#65039;</div>
+  <div class="loading-text">
+    正在推算你的江湖命运<span class="loading-dots"></span>
+  </div>
+</div>
+
+<!-- ==================== RESULT PAGE ==================== -->
+<div class="page" id="result">
+  <div class="result-hero">
+    <div class="result-emoji" id="resultEmoji"></div>
+    <div class="result-code" id="resultCode"></div>
+    <div class="result-name" id="resultName"></div>
+    <div class="result-title" id="resultTitle"></div>
+    <div class="result-quote" id="resultQuote"></div>
+    <div class="match-score" id="matchScore"></div>
+  </div>
+  <div class="result-body">
+    <div class="result-card" style="animation-delay: 0.1s">
+      <div class="result-card-title">你是谁</div>
+      <p id="resultDesc"></p>
+      <div class="result-traits" id="resultTraits"></div>
+    </div>
+    <div class="result-card" style="animation-delay: 0.3s">
+      <div class="result-card-title">六维画像</div>
+      <p>你的江湖行为模式（原始数据）：</p>
+      <div class="trait-bars" id="traitBars"></div>
+    </div>
+    <div class="result-card" style="animation-delay: 0.5s">
+      <div class="result-card-title">你的"优势"</div>
+      <p id="resultStrength"></p>
+    </div>
+    <div class="result-card" style="animation-delay: 0.7s">
+      <div class="result-card-title">你需要"注意"的</div>
+      <p id="resultWeakness"></p>
+      <div class="result-hidden">
+        <div class="result-hidden-title">&#9888; 隐藏特质（慎看）</div>
+        <p id="resultHidden"></p>
+      </div>
+    </div>
+  </div>
+  <div class="result-share">
+    <div class="result-share-title">成功被破防？把结果扔出去破防你的朋友</div>
+    <button class="btn-share" onclick="shareResult()">&#128172; 分享给好友</button>
+    <br>
+    <button class="btn-retry" onclick="retry()">不服，重测</button>
+  </div>
+  <div class="result-footer">
+    WBTI Wushu Behavioral Type Indicator &middot; 零科学，全是氛围 &middot; <a href="javascript:void(0)">关于我们</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="app.js"></script>
+
+<!-- ==================== SHARE CARD (hidden, rendered for screenshot) ==================== -->
+<div id="shareCard" style="position:fixed;left:-9999px;top:0;width:375px;background:#0a0a0f;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;padding:32px 24px;text-align:center;color:#e8e6e3;">
+  <div style="font-size:48px;margin-bottom:12px;filter:drop-shadow(0 0 16px rgba(255,215,0,0.4));" id="scEmoji"></div>
+  <div style="display:inline-block;padding:5px 18px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:4px;font-size:18px;font-weight:800;color:#ffd700;letter-spacing:6px;margin-bottom:8px;text-shadow:0 0 10px rgba(255,215,0,0.5);" id="scCode"></div>
+  <div style="font-size:22px;font-weight:700;letter-spacing:3px;margin-bottom:4px;" id="scName"></div>
+  <div style="font-size:12px;color:#8b8b9e;letter-spacing:1px;margin-bottom:16px;" id="scTitle"></div>
+  <div style="font-size:13px;color:#9a9aae;font-style:italic;line-height:1.8;max-width:280px;margin:0 auto 20px;" id="scQuote"></div>
+  <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:20px;" id="scTags"></div>
+  <div id="scBars" style="text-align:left;padding:0 12px;margin-bottom:20px;"></div>
+  <div style="margin-bottom:20px;font-size:12px;color:#7a7a8e;line-height:1.6;" id="scDesc"></div>
+  <div style="border-top:1px solid #2a2a3e;padding-top:16px;margin-top:4px;">
+    <div style="font-size:12px;color:#ffd700;letter-spacing:4px;font-weight:700;">WBTI</div>
+    <div style="font-size:9px;color:#5a5a6e;letter-spacing:1px;margin-top:2px;">Wushu Behavioral Type Indicator</div>
+    <div style="font-size:11px;color:#8b8b9e;margin-top:12px;">测测你在江湖里是什么角色 →</div>
+  </div>
+</div>
+
+<!-- ==================== SHARE MODAL ==================== -->
+<div id="shareModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.92);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:20px;">
+  <div style="color:#8b8b9e;font-size:12px;margin-bottom:12px;letter-spacing:1px;">长按图片保存到相册</div>
+  <img id="shareImage" src="" style="max-width:90vw;max-height:75vh;border-radius:12px;box-shadow:0 8px 40px rgba(255,215,0,0.15);" alt="分享图片">
+  <div style="margin-top:20px;display:flex;gap:16px;">
+    <button onclick="closeShareModal()" style="background:none;border:1px solid #3a3a4e;color:#8b8b9e;padding:10px 28px;border-radius:50px;font-size:14px;cursor:pointer;">关闭</button>
+    <button onclick="downloadImage()" style="background:linear-gradient(135deg,#07c160,#06ad56);border:none;color:#fff;padding:10px 28px;border-radius:50px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(7,193,96,0.3);">保存图片</button>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#0a0a0f",
+    "navigationBarTitleText": "WBTI 武侠测试",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0a0a0f",
+    "pageBackgroundColor": "#0a0a0f"
+  },
+  "style": "v2"
+}

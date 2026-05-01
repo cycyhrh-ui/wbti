@@ -1,0 +1,139 @@
+<!--WBTI \u00b7 \u6b66\u4fa0\u884c\u4e3a\u7c7b\u578b\u6307\u793a\u5668-->
+<view class="page">
+
+  <!-- ===== \u6b22\u8fce\u9875 ===== -->
+  <view class="page {{currentPage==='welcome'?'active':''}}" wx:if="{{currentPage==='welcome'}}">
+    <view class="welcome">
+      <view class="welcome-glow"></view>
+      <view class="welcome-badge">WBTI</view>
+      <text class="welcome-sub">\u6b66\u4fa0\u884c\u4e3a\u7c7b\u578b\u6307\u793a\u5668</text>
+      <text class="welcome-sub2">Wushu Behavioral Type Indicator</text>
+      <text class="welcome-quote">\u201c\u4f60\u7684\u6c5f\u6e56\uff0c\u4ece\u8fd9\u4e00\u6b65\u5f00\u59cb\u3002\u201d</text>
+      <text class="welcome-count">\u5df2\u6709 {{fakeCount}} \u4eba\u5b8c\u6210\u6d4b\u8bd5</text>
+      <view class="btn-primary" bindtap="startTest">
+        <text>\u8fdb\u5165\u6c5f\u6e56</text>
+      </view>
+      <view class="welcome-footer">
+        <text>\u96f6\u79d1\u5b66\uff0c\u5168\u662f\u6c1b\u56f4 \u00b7 WBTI v2.1</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== \u7b54\u9898\u9875 ===== -->
+  <view class="page {{currentPage==='question'?'active':''}}" wx:if="{{currentPage==='question'}}">
+    <view class="question-wrap">
+      <view class="progress-area">
+        <text class="progress-text">{{currentQ + 1}} / {{totalQ}}</text>
+        <view class="progress-bar">
+          <view class="progress-fill" style="width:{{progressPercent}}%"></view>
+        </view>
+      </view>
+      <view class="q-body">
+        <text class="q-scene">{{currentScene}}</text>
+        <view class="q-options">
+          <view class="q-option {{selectedIdx===index?'selected':''}}"
+                wx:for="{{currentOptions}}" wx:key="index"
+                data-index="{{index}}" bindtap="selectOption">
+            <text class="q-option-label">{{item.label}}</text>
+            <text class="q-option-text">{{item.text}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="btn-next {{selectedIdx>=0?'visible':''}}" bindtap="nextQuestion">
+        <text>\u4e0b\u4e00\u9898</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== \u52a0\u8f7d\u9875 ===== -->
+  <view class="page {{currentPage==='loading'?'active':''}}" wx:if="{{currentPage==='loading'}}">
+    <view class="loading-wrap">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">\u5929\u673a\u4e0d\u53ef\u6cc4\u9732\u2026\u2026</text>
+      <text class="loading-text2">\u6b63\u5728\u8ba1\u7b97\u4f60\u7684\u6c5f\u6e56\u547d\u8fd0</text>
+    </view>
+  </view>
+
+  <!-- ===== \u7ed3\u679c\u9875 ===== -->
+  <view class="page {{currentPage==='result'?'active':''}}" wx:if="{{currentPage==='result'}}">
+    <view class="result-wrap">
+      <view class="result-header">
+        <text class="result-emoji">{{result.emoji}}</text>
+        <text class="result-code">{{result.code}}</text>
+        <text class="result-name">{{result.name}}</text>
+        <text class="result-title">{{result.title}}</text>
+        <text class="result-match" wx:if="{{result.similarity>0}}">\u5339\u914d\u5ea6 {{result.similarity}}%</text>
+      </view>
+
+      <view class="result-quote">
+        <text>{{result.quote}}</text>
+      </view>
+
+      <view class="result-section">
+        <text class="section-title">\u6c5f\u6e56\u5bc6\u7801</text>
+        <view class="trait-bars">
+          <view class="trait-bar-row" wx:for="{{traitBars}}" wx:key="dim">
+            <text class="trait-bar-label">{{item.label}}</text>
+            <view class="trait-bar-track">
+              <view class="trait-bar-fill" style="width:{{item.percent}}%"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="result-section">
+        <text class="section-title">\u4eba\u683c\u89e3\u6790</text>
+        <text class="result-desc">{{result.desc}}</text>
+      </view>
+
+      <view class="result-traits">
+        <text class="result-tag" wx:for="{{result.tags}}" wx:key="*this">{{item}}</text>
+      </view>
+
+      <view class="result-section">
+        <text class="section-title strong-title">\u7edd\u62db</text>
+        <text class="result-detail">{{result.strong}}</text>
+      </view>
+
+      <view class="result-section">
+        <text class="section-title weak-title">\u7f3a\u70b9</text>
+        <text class="result-detail">{{result.weak}}</text>
+      </view>
+
+      <view class="result-section">
+        <text class="section-title secret-title">\u6697\u9762</text>
+        <text class="result-detail">{{result.secret}}</text>
+      </view>
+
+      <view class="result-actions">
+        <view class="btn-share" bindtap="shareResult">
+          <text>\u5206\u4eab\u7ed9\u597d\u53cb</text>
+        </view>
+        <view class="btn-retry" bindtap="retry">
+          <text>\u518d\u95ef\u4e00\u6b21</text>
+        </view>
+      </view>
+
+      <view class="result-footer">
+        <text>WBTI Wushu Behavioral Type Indicator \u00b7 \u96f6\u79d1\u5b66\uff0c\u5168\u662f\u6c1b\u56f4</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== \u5206\u4eab\u5f39\u7a97 ===== -->
+  <view class="modal-mask" wx:if="{{showShareModal}}" bindtap="closeShareModal">
+    <view class="modal-content" catchtap="">
+      <text class="modal-title">\u4fdd\u5b58\u6d77\u62a5\u5206\u4eab\u7ed9\u597d\u53cb</text>
+      <canvas canvas-id="shareCanvas" class="share-canvas" id="shareCanvas"></canvas>
+      <view class="modal-actions">
+        <view class="btn-save" bindtap="saveShareImage">
+          <text>\u4fdd\u5b58\u56fe\u7247\u5230\u76f8\u518c</text>
+        </view>
+        <view class="btn-close" bindtap="closeShareModal">
+          <text>\u5173\u95ed</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+</view>
